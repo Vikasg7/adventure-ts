@@ -6,8 +6,6 @@ interface Node<T> {
    right?: Node<T>
 }
 
-type NodeValue<T> = T
-
 type Grid<T> = Array<Array<T>>
 type Row<T>  = Array<T> 
 
@@ -33,27 +31,32 @@ function depth<T>(root: Node<T>): Depth {
    return depth
 }
 
-function to_grid<T>(root: Node<T>): Grid<NodeValue<T>> {
-   const grid = [[root]]
+function to_grid<T>(root: Node<T>): Grid<Maybe<T>> {
+   const grid: Grid<Maybe<Node<T>>> = [[root]]
+   
    let depth = 0
    while (true) {
       const row = []
+      let empty = true
       for (const node of grid[depth]) {
-         if (node.left)  row.push(node.left);
-         if (node.right) row.push(node.right);
+         if (node == undefined) continue;
+         row.push(node.left);
+         row.push(node.right);
+         if (node.left || node.right) empty = false;
       }
-      if (row.length == 0) break;
+      if (empty) break;
       grid.push(row)
       depth++
    }
    
    for (const row of grid) {
-      for (const [i, r] of row.entries()) {
-         (row as Row<NodeValue<T>>)[i] = r.value
+      for (const [i, node] of row.entries()) {
+         if (node == undefined) continue;
+         (row as Row<Maybe<T>>)[i] = node.value
       }
    }
 
-   return (grid as Grid<NodeValue<T>>)
+   return (grid as Grid<Maybe<T>>)
 }
 
 function print_tree<T>(tree: Node<T>) {
@@ -93,4 +96,5 @@ function main() {
    print_tree(tree)
 }
 
-main()
+if (import.meta.main)
+   main();
