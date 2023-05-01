@@ -1,18 +1,19 @@
-type Maybe<T> = T | undefined 
+type NodeValue<T> = T
 
 interface Node<T> {
-   value:  T,
+   value:  NodeValue<T>,
    left?:  Node<T>,
    right?: Node<T>
 }
 
-type Grid<T> = Array<Array<T>>
-type Row<T>  = Array<T> 
+type Row<T>  = Array<T>
+type Grid<T> = Array<Row<T>>
+type Depth   = number
 
-type Depth = number
+type Maybe<T> = T | undefined
 
 function create_node<T>(value:T): Node<T> {
-   return { value }
+   return { value, left: undefined, right: undefined }
 }
 
 function depth<T>(root: Node<T>): Depth {
@@ -31,7 +32,7 @@ function depth<T>(root: Node<T>): Depth {
    return depth
 }
 
-function to_grid<T>(root: Node<T>): Grid<Maybe<T>> {
+function to_grid<T>(root: Node<T>): Grid<Maybe<NodeValue<T>>> {
    const grid: Grid<Maybe<Node<T>>> = [[root]]
    
    let depth = 0
@@ -52,11 +53,11 @@ function to_grid<T>(root: Node<T>): Grid<Maybe<T>> {
    for (const row of grid) {
       for (const [i, node] of row.entries()) {
          if (node == undefined) continue;
-         (row as Row<Maybe<T>>)[i] = node.value
+         (row as Row<Maybe<NodeValue<T>>>)[i] = node.value
       }
    }
 
-   return (grid as Grid<Maybe<T>>)
+   return (grid as Grid<Maybe<NodeValue<T>>>)
 }
 
 function print_tree<T>(tree: Node<T>) {
