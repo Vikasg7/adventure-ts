@@ -40,7 +40,11 @@ function to_grid<T>(root: Node<T>): Grid<Maybe<NodeValue<T>>> {
       const row = []
       let empty = true
       for (const node of grid[depth]) {
-         if (node == undefined) continue;
+         if (node == undefined) {
+            row.push(undefined)
+            row.push(undefined)
+            continue
+         }
          row.push(node.left);
          row.push(node.right);
          if (node.left || node.right) empty = false;
@@ -60,8 +64,25 @@ function to_grid<T>(root: Node<T>): Grid<Maybe<NodeValue<T>>> {
    return (grid as Grid<Maybe<NodeValue<T>>>)
 }
 
-function print_tree<T>(tree: Node<T>) {
-   console.log(JSON.stringify(tree, null, 2))
+function to_string<T>(nv?: NodeValue<T>): string {
+   if (nv == undefined) return "__";
+   return nv.toString()
+}
+
+function print_tree<T>(tree: Node<T>): void {
+   const grid  = to_grid(tree)
+   const depth = grid.length
+   const width = 2 ** depth
+   for (const [r, row] of grid.entries()) {
+      const fstIdx = 2 ** (depth - r - 1)
+      const offset = 2 ** (depth - r)
+      const eleCnt = 2 ** r
+      const line = new Array(width)
+      line.fill("  ")
+      for (let i = 0; i < eleCnt; i++)
+         line[fstIdx + (offset * i)] = to_string(row[i]);
+      console.log(line.join(""), "\n")
+   }
 }
 
 function insert_rec<T>(value: T, root?: Node<T>): Node<T> {
@@ -89,9 +110,10 @@ function insert_iter<T>(value: T, root?: Node<T>): Node<T> {
 }
 
 function main() {
-   const values = [ 15, 79, 90, 10, 55, 12, 20, 50]
+   const values = [ 15, 79, 90, 10, 55, 12, 20, 50, 46, 18]
    const root = create_node(45);
    const tree = values.reduce((acc, v) => insert_iter(v, acc), root)
+   console.log(tree)
    console.log(to_grid(tree))
    console.log("Depth is ", depth(tree))
    print_tree(tree)
