@@ -6,6 +6,9 @@ interface Node<T> {
    right?: Node<T>
 }
 
+type Side = "left" | "right"
+
+type Root<T> = Node<T>
 type Row<T>  = Array<T>
 type Grid<T> = Array<Row<T>>
 type Depth   = number
@@ -85,14 +88,32 @@ function print_tree<T>(tree: Node<T>): void {
    }
 }
 
-function insert_rec<T>(value: T, root?: Node<T>): Node<T> {
+function insert_tail_rec<T>(value: T, root?: Root<T>, curr?: Node<T>, side?: Side): Root<T> {
+   if (root == undefined) return create_node(value)
+   if (curr == undefined) curr = root
+   if (side == undefined) {
+      if (value < curr.value) return insert_tail_rec(value, root, curr, "left"); 
+      if (value > curr.value) return insert_tail_rec(value, root, curr, "right");
+      return root
+   }
+   const next = curr[side]
+   if (next == undefined) {
+      curr[side] = create_node(value)
+      return root
+   }
+   if (value < next.value) return insert_tail_rec(value, root, next, "left"); 
+   if (value > next.value) return insert_tail_rec(value, root, next, "right");
+   return root
+}
+
+function insert_rec<T>(value: T, root?: Root<T>): Root<T> {
    if (root == undefined) return create_node(value);
    if (value < root.value) root.left  = insert_rec(value, root.left); else
    if (value > root.value) root.right = insert_rec(value, root.right);
    return root;
 }
 
-function insert_iter<T>(value: T, root?: Node<T>): Node<T> {
+function insert_iter<T>(value: T, root?: Root<T>): Root<T> {
    if (root == undefined) return create_node(value);
 
    let prev: Maybe<Node<T>> = undefined,
@@ -112,7 +133,7 @@ function insert_iter<T>(value: T, root?: Node<T>): Node<T> {
 function main() {
    const values = [ 15, 79, 90, 10, 55, 12, 20, 50, 46, 18]
    const root = create_node(45);
-   const tree = values.reduce((acc, v) => insert_iter(v, acc), root)
+   const tree = values.reduce((acc, v) => insert_tail_rec(v, acc), root)
    console.log(tree)
    console.log(to_grid(tree))
    console.log("Depth is ", depth(tree))
