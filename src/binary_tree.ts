@@ -72,7 +72,9 @@ function to_string<T>(nv?: NodeValue<T>): string {
    return nv.toString()
 }
 
-function print_tree<T>(tree: Node<T>): void {
+function print_tree<T>(tree?: Node<T>): void {
+   if (tree == undefined) 
+      return console.log("Oops! Tree is empty.");
    const grid  = to_grid(tree)
    const depth = grid.length
    const width = 2 ** depth
@@ -130,14 +132,26 @@ function insert_iter<T>(value: T, root?: Root<T>): Root<T> {
    return root;
 }
 
+function binary_search<T>(value: NodeValue<T>, root?: Root<T>): Maybe<Node<T>> {
+   if (root == undefined) return undefined
+   let curr: Maybe<Node<T>> = root
+   do {
+      if (value < curr.value) curr = curr.left;  else
+      if (value > curr.value) curr = curr.right; else
+      return curr;
+   } while (curr != undefined)
+   return undefined;
+}
+
 function main() {
-   const values = [ 15, 79, 90, 10, 55, 12, 20, 50, 46, 18]
-   const root = create_node(45);
-   const tree = values.reduce((acc, v) => insert_tail_rec(v, acc), root)
-   console.log(tree)
-   console.log(to_grid(tree))
-   console.log("Depth is ", depth(tree))
+   const values = [45, 15, 79, 90, 10, 55, 12, 20, 50, 46, 18]
+   const root = undefined as Maybe<Root<number>>
+   const tree = values.reduce((acc, v) => insert_iter(v, acc), root)
    print_tree(tree)
+   const needle = 46
+   const found = binary_search(needle, tree)
+   console.log("Searching for key: ", needle)
+   console.log("       Node found: ", found)
 }
 
 if (import.meta.main)
