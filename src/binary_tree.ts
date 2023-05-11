@@ -132,8 +132,7 @@ function insert_iter<T>(value: T, root?: Root<T>): Root<T> {
    return root;
 }
 
-function binary_search<T>(value: NodeValue<T>, root?: Root<T>): Maybe<Node<T>> {
-   if (root == undefined) return undefined
+function binary_search<T>(value: NodeValue<T>, root: Root<T>): Maybe<Node<T>> {
    let curr: Maybe<Node<T>> = root
    do {
       if (value < curr.value) curr = curr.left;  else
@@ -146,7 +145,7 @@ function binary_search<T>(value: NodeValue<T>, root?: Root<T>): Maybe<Node<T>> {
 function main() {
    const values = [45, 15, 79, 90, 10, 55, 12, 20, 50, 46, 18]
    const root = undefined as Maybe<Root<number>>
-   const tree = values.reduce((acc, v) => insert_iter(v, acc), root)
+   const tree = values.reduce((acc, v) => insert_iter(v, acc), root) as Root<number>
    print_tree(tree)
    const needle = 46
    const found = binary_search(needle, tree)
